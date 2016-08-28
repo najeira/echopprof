@@ -2,11 +2,18 @@ package echopprof
 
 import (
 	"github.com/labstack/echo"
+
+	"net/http"
 	"net/http/pprof"
 )
 
+const textHtmlContentType = "text/html; charset=utf-8"
+
 func Wrap(e *echo.Echo) {
-	e.GET("/debug/pprof/", fromHandlerFunc(pprof.Index).Handle)
+	e.GET("/debug/pprof/", fromHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(echo.HeaderContentType, textHtmlContentType)
+		pprof.Index(w, r)
+	}).Handle)
 	e.GET("/debug/pprof/heap", fromHTTPHandler(pprof.Handler("heap")).Handle)
 	e.GET("/debug/pprof/goroutine", fromHTTPHandler(pprof.Handler("goroutine")).Handle)
 	e.GET("/debug/pprof/block", fromHTTPHandler(pprof.Handler("block")).Handle)
