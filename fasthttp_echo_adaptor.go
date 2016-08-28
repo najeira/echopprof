@@ -7,6 +7,7 @@ import (
 	"io"
 	"fmt"
 	"strings"
+	"bytes"
 )
 
 const textPlainContentType = "text/plain"
@@ -53,11 +54,13 @@ func NewFastHTTPEchoAdaptor(h http.Handler) echo.HandlerFunc  {
 			}
 		}
 
+		writerBody := w.body.Bytes()
 		if strings.Contains(c.Response().Header().Get(echo.HeaderContentType), textPlainContentType) {
-			c.Response().Header().Set(echo.HeaderContentType, http.DetectContentType(w.body))
+			c.Response().Header().Set(echo.HeaderContentType, http.DetectContentType(writerBody))
 		}
-		c.Response().Write(w.body)
-		return nil
+
+		_, err = c.Response().Write(writerBody)
+		return err
 	}
 }
 
@@ -82,7 +85,7 @@ func (r *netHTTPBody) Close() error {
 type netHTTPResponseWriter struct {
 	statusCode int
 	h          http.Header
-	body       []byte
+	body       bytes.Buffer
 }
 
 func (w *netHTTPResponseWriter) StatusCode() int {
@@ -104,6 +107,5 @@ func (w *netHTTPResponseWriter) WriteHeader(statusCode int) {
 }
 
 func (w *netHTTPResponseWriter) Write(p []byte) (int, error) {
-	w.body = append(w.body, p...)
-	return len(p), nil
+	return w.body.Write(p)
 }
