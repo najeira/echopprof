@@ -3,7 +3,7 @@ A wrapper for golang web framework echo to use net/http/pprof easily.
 # install
 First install echopprof to your GOPATH using go get:
 ```
-go get github.com/echo-contrib/echopprof
+go get github.com/najeira/echopprof
 ```
 # Usage
 ```
@@ -12,7 +12,7 @@ package main
 import (
     "github.com/labstack/echo"
     "github.com/labstack/echo/engine/standard"
-    "github.com/echo-contrib/echopprof"
+    "github.com/najeira/echopprof"
 )
 
 func hello() echo.HandlerFunc {
